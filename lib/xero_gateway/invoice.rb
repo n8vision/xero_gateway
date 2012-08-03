@@ -36,7 +36,9 @@ module XeroGateway
     attr_accessor :line_items_downloaded
   
     # All accessible fields
-    attr_accessor :invoice_id, :invoice_number, :invoice_type, :invoice_status, :date, :due_date, :reference, :line_amount_types, :currency_code, :line_items, :contact, :payments, :fully_paid_on, :amount_due, :amount_paid, :amount_credited, :sent_to_contact, :url
+    #NICKEDIT - added BrandingThemeID
+
+    attr_accessor :branding_theme_id, :invoice_id, :invoice_number, :invoice_type, :invoice_status, :date, :due_date, :reference, :line_amount_types, :currency_code, :line_items, :contact, :payments, :fully_paid_on, :amount_due, :amount_paid, :amount_credited, :sent_to_contact, :url
 
     
     def initialize(params = {})
@@ -187,6 +189,8 @@ module XeroGateway
         b.DueDate Invoice.format_date(self.due_date) if self.due_date
         b.Status self.invoice_status if self.invoice_status
         b.Reference self.reference if self.reference
+        #NICKEDIT - adding BrandingThemeID
+        b.BrandingThemeID self.branding_theme_id if self.branding_theme_id
         b.LineAmountTypes self.line_amount_types
         b.LineItems {
           self.line_items.each do |line_item|
@@ -211,6 +215,8 @@ module XeroGateway
           when "DueDate" then invoice.due_date = parse_date(element.text)
           when "Status" then invoice.invoice_status = element.text
           when "Reference" then invoice.reference = element.text
+          #NICKEDIT - adding BrandingThemeID
+          when "BrandingThemeID" then invoice.branding_theme_id = element.text
           when "LineAmountTypes" then invoice.line_amount_types = element.text
           when "LineItems" then element.children.each {|line_item| invoice.line_items_downloaded = true; invoice.line_items << LineItem.from_xml(line_item) }
           when "SubTotal" then invoice.sub_total = BigDecimal.new(element.text)
